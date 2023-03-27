@@ -9,7 +9,7 @@ $password = "";
 $errors = array();
 
 // connect to the database
-$db = mysqli_connect('localhost', 'root', '', 'timetable_tool2');
+$db = mysqli_connect('localhost', 'timefadetool', 'QJJHpr8qFrR1aCbk', 'timefadetool');
 
 // REGISTER INSTRUCTOR
 if (isset($_POST['reg_user'])) {
@@ -101,6 +101,10 @@ if (isset($_POST['login_user'])) {
             if (mysqli_num_rows($results) == 1) {
                 $_SESSION['username'] = $username;
                 $_SESSION['admin'] = 1;
+                $query = "DELETE FROM run";
+                mysqli_query($db, $query);
+                $query = "INSERT INTO run (start) VALUES('0')";
+                mysqli_query($db, $query);
                 header('location: admin/admin.php');
             } else {
                 function_alert("Wrong credentials!");
@@ -122,9 +126,39 @@ if (isset($_POST['add_course'])) {
             $course_type = mysqli_real_escape_string($db, $_POST['course_type']);
             $max_students = mysqli_real_escape_string($db, $_POST['max_students']);
             $loggedin_instructor_username = $_SESSION['username'];
-            $query = "INSERT INTO courses (course_code, max_students, course_type, instructor_username) 
-                    VALUES('$course_code', '$max_students', '$course_type', '$loggedin_instructor_username')";
-            mysqli_query($db, $query);
+            $query = "";
+            if ($course_type == 1) {
+                $query = "INSERT INTO courses (course_code, max_students, course_type, instructor_username) 
+                    VALUES('$course_code', '$max_students', '1', '$loggedin_instructor_username')";
+                mysqli_query($db, $query);
+            } elseif ($course_type == 2) {
+                $query = "INSERT INTO courses (course_code, max_students, course_type, instructor_username) 
+                    VALUES('$course_code', '$max_students', '1', '$loggedin_instructor_username');";
+                mysqli_query($db, $query);
+                $query = "INSERT INTO courses (course_code, max_students, course_type, instructor_username) 
+                    VALUES('" . $course_code . "_T', '$max_students', '3', '$loggedin_instructor_username')";
+                mysqli_query($db, $query);
+            } elseif ($course_type == 3) {
+                $query = "INSERT INTO courses (course_code, max_students, course_type, instructor_username) 
+                    VALUES('$course_code', '$max_students', '1', '$loggedin_instructor_username');";
+                mysqli_query($db, $query);
+                $query = "INSERT INTO courses (course_code, max_students, course_type, instructor_username) 
+                    VALUES('" . $course_code . "_T', '$max_students', '3', '$loggedin_instructor_username');";
+                mysqli_query($db, $query);
+                $query = "INSERT INTO courses (course_code, max_students, course_type) 
+                    VALUES('" . $course_code . "_L', '$max_students', '2')";
+                mysqli_query($db, $query);
+            } else {
+                $query = "INSERT INTO courses (course_code, max_students, course_type, instructor_username) 
+                    VALUES('$course_code', '$max_students', '1', '$loggedin_instructor_username');";
+                mysqli_query($db, $query);
+                $query = "INSERT INTO courses (course_code, max_students, course_type, instructor_username) 
+                    VALUES('" . $course_code . "_T', '$max_students', '3', '$loggedin_instructor_username');";
+                mysqli_query($db, $query);
+                $query = "INSERT INTO courses (course_code, max_students, course_type) 
+                    VALUES('". $course_code . "_L', '$max_students', '4')";
+                mysqli_query($db, $query);
+            }
             function_alert("Course Added!");
             $_SESSION['added_course'] = $course_code;
             header('location: pref_days.php');
@@ -133,22 +167,41 @@ if (isset($_POST['add_course'])) {
 }
 
 // ADD LAB
+// if (isset($_POST['add_lab'])) {
+//     $course_code = mysqli_real_escape_string($db, $_POST['course_code']);
+//     $query = "SELECT * FROM courses WHERE course_code='$course_code' LIMIT 1";
+//     $result = mysqli_query($db, $query);
+//     $user = mysqli_fetch_assoc($result);
+//     if (!$user) {
+//         function_alert("Course does not exists!");
+//     } else {
+//         if (count($errors) == 0) {
+//             $lab_code = mysqli_real_escape_string($db, $_POST['lab_code']);
+//             $course_type = 5;
+//             $max_students = 30;
+//             $loggedin_instructor_username = $_SESSION['username'];
+//             $course_code = $course_code . '_' . $lab_code;
+//             $query = "INSERT INTO courses (course_code, max_students, course_type, instructor_username) 
+//                     VALUES('$course_code', '$max_students', '$course_type', '$loggedin_instructor_username')";
+//             mysqli_query($db, $query);
+//             function_alert("Lab Added!");
+//             $_SESSION['added_course'] = $course_code;
+//             header('location: pref_days.php');
+//         }
+//     }
+// }
+
 if (isset($_POST['add_lab'])) {
-    $course_code = mysqli_real_escape_string($db, $_POST['course_code']);
-    $query = "SELECT * FROM courses WHERE course_code='$course_code' LIMIT 1";
+    $lab_code = mysqli_real_escape_string($db, $_POST['lab_code']);
+    $query = "SELECT * FROM courses WHERE course_code='$lab_code' LIMIT 1";
     $result = mysqli_query($db, $query);
     $user = mysqli_fetch_assoc($result);
     if (!$user) {
-        function_alert("Course does not exists!");
+        function_alert("Lab does not exists!");
     } else {
         if (count($errors) == 0) {
-            $lab_code = mysqli_real_escape_string($db, $_POST['lab_code']);
-            $course_type = 5;
-            $max_students = 30;
             $loggedin_instructor_username = $_SESSION['username'];
-            $course_code = $course_code . '_' . $lab_code;
-            $query = "INSERT INTO courses (course_code, max_students, course_type, instructor_username) 
-                    VALUES('$course_code', '$max_students', '$course_type', '$loggedin_instructor_username')";
+            $query = "UPDATE courses SET instructor_username = '$loggedin_instructor_username' WHERE course_code = '$lab_code'";
             mysqli_query($db, $query);
             function_alert("Lab Added!");
             $_SESSION['added_course'] = $course_code;
@@ -204,8 +257,6 @@ if (isset($_POST['add_pref_days'])) {
 if (isset($_POST['add_preferred_hours_mt'])) {
     $course_code =  $_SESSION['added_course'];
     if (count($errors) == 0) {
-        $h_7 = mysqli_real_escape_string($db, $_POST['h_7']);
-        $h_8 = mysqli_real_escape_string($db, $_POST['h_8']);
         $h_9 = mysqli_real_escape_string($db, $_POST['h_9']);
         $h_1030 = mysqli_real_escape_string($db, $_POST['h_1030']);
         $h_12 = mysqli_real_escape_string($db, $_POST['h_12']);
@@ -214,17 +265,6 @@ if (isset($_POST['add_preferred_hours_mt'])) {
         $h_1630 = mysqli_real_escape_string($db, $_POST['h_1630']);
         $h_18 = mysqli_real_escape_string($db, $_POST['h_18']);
         $h_1930 = mysqli_real_escape_string($db, $_POST['h_1930']);
-        $h_21 = mysqli_real_escape_string($db, $_POST['h_21']);
-        if ($h_7 == 1) {
-            $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '1', '7.0')";
-            mysqli_query($db, $query);
-        }
-        if ($h_8 == 1) {
-            $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '1', '8.0')";
-            mysqli_query($db, $query);
-        }
         if ($h_9 == 1) {
             $query = "INSERT INTO courses_hours (course_code, day, hour) 
                     VALUES('$course_code', '1', '9.0')";
@@ -232,7 +272,7 @@ if (isset($_POST['add_preferred_hours_mt'])) {
         }
         if ($h_1030 == 1) {
             $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '1', '10.3')";
+                    VALUES('$course_code', '1', '10.5')";
             mysqli_query($db, $query);
         }
         if ($h_12 == 1) {
@@ -242,7 +282,7 @@ if (isset($_POST['add_preferred_hours_mt'])) {
         }
         if ($h_1330 == 1) {
             $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '1', '13.3')";
+                    VALUES('$course_code', '1', '13.5')";
             mysqli_query($db, $query);
         }
         if ($h_15 == 1) {
@@ -252,7 +292,7 @@ if (isset($_POST['add_preferred_hours_mt'])) {
         }
         if ($h_1630 == 1) {
             $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '1', '16.3')";
+                    VALUES('$course_code', '1', '16.5')";
             mysqli_query($db, $query);
         }
         if ($h_18 == 1) {
@@ -262,12 +302,7 @@ if (isset($_POST['add_preferred_hours_mt'])) {
         }
         if ($h_1930 == 1) {
             $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '1', '19.3')";
-            mysqli_query($db, $query);
-        }
-        if ($h_21 == 1) {
-            $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '1', '21.0')";
+                    VALUES('$course_code', '1', '19.5')";
             mysqli_query($db, $query);
         }
         if ($_SESSION['w'] == 1) {
@@ -285,69 +320,76 @@ if (isset($_POST['add_preferred_hours_w'])) {
         $h_7 = mysqli_real_escape_string($db, $_POST['h_7']);
         $h_8 = mysqli_real_escape_string($db, $_POST['h_8']);
         $h_9 = mysqli_real_escape_string($db, $_POST['h_9']);
-        $h_1030 = mysqli_real_escape_string($db, $_POST['h_1030']);
+        $h_10 = mysqli_real_escape_string($db, $_POST['h_10']);
+        $h_11 = mysqli_real_escape_string($db, $_POST['h_11']);
         $h_12 = mysqli_real_escape_string($db, $_POST['h_12']);
-        $h_1330 = mysqli_real_escape_string($db, $_POST['h_1330']);
+        $h_13 = mysqli_real_escape_string($db, $_POST['h_13']);
+        $h_14 = mysqli_real_escape_string($db, $_POST['h_14']);
         $h_15 = mysqli_real_escape_string($db, $_POST['h_15']);
-        $h_1630 = mysqli_real_escape_string($db, $_POST['h_1630']);
+        $h_16 = mysqli_real_escape_string($db, $_POST['h_16']);
+        $h_17 = mysqli_real_escape_string($db, $_POST['h_17']);
         $h_18 = mysqli_real_escape_string($db, $_POST['h_18']);
-        $h_1930 = mysqli_real_escape_string($db, $_POST['h_1930']);
-        $h_21 = mysqli_real_escape_string($db, $_POST['h_21']);
         if ($h_7 == 1) {
-            $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '2', '7.0')";
+            $query = "INSERT INTO courses_hours_wednesdays (course_code, hour) 
+                    VALUES('$course_code', '7.0')";
             mysqli_query($db, $query);
         }
         if ($h_8 == 1) {
-            $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '2', '8.0')";
+            $query = "INSERT INTO courses_hours_wednesdays (course_code, hour) 
+                    VALUES('$course_code', '8.0')";
             mysqli_query($db, $query);
         }
         if ($h_9 == 1) {
-            $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '2', '9.0')";
+            $query = "INSERT INTO courses_hours_wednesdays (course_code, hour) 
+                    VALUES('$course_code', '9.0')";
             mysqli_query($db, $query);
         }
-        if ($h_1030 == 1) {
-            $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '2', '10.3')";
+        if ($h_10 == 1) {
+            $query = "INSERT INTO courses_hours_wednesdays (course_code, hour) 
+                    VALUES('$course_code', '10.0')";
+            mysqli_query($db, $query);
+        }
+        if ($h_11 == 1) {
+            $query = "INSERT INTO courses_hours_wednesdays (course_code, hour) 
+                    VALUES('$course_code', '11.0')";
             mysqli_query($db, $query);
         }
         if ($h_12 == 1) {
-            $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '2', '12.0')";
+            $query = "INSERT INTO courses_hours_wednesdays (course_code, hour) 
+                    VALUES('$course_code', '12.0')";
             mysqli_query($db, $query);
         }
-        if ($h_1330 == 1) {
-            $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '2', '13.3')";
+        if ($h_13 == 1) {
+            $query = "INSERT INTO courses_hours_wednesdays (course_code, hour) 
+                    VALUES('$course_code', '13.0')";
+            mysqli_query($db, $query);
+        }
+        if ($h_14 == 1) {
+            $query = "INSERT INTO courses_hours_wednesdays (course_code, hour) 
+                    VALUES('$course_code', '14.0')";
             mysqli_query($db, $query);
         }
         if ($h_15 == 1) {
-            $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '2', '15.0')";
+            $query = "INSERT INTO courses_hours_wednesdays (course_code, hour) 
+                    VALUES('$course_code', '15.0')";
             mysqli_query($db, $query);
         }
-        if ($h_1630 == 1) {
-            $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '2', '16.3')";
+        if ($h_16 == 1) {
+            $query = "INSERT INTO courses_hours_wednesdays (course_code, hour) 
+                    VALUES('$course_code', '16.0')";
+            mysqli_query($db, $query);
+        }
+        if ($h_17 == 1) {
+            $query = "INSERT INTO courses_hours_wednesdays (course_code, hour) 
+                    VALUES('$course_code', '17.0')";
             mysqli_query($db, $query);
         }
         if ($h_18 == 1) {
-            $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '2', '18.0')";
+            $query = "INSERT INTO courses_hours_wednesdays (course_code, hour) 
+                    VALUES('$course_code', '18.0')";
             mysqli_query($db, $query);
         }
-        if ($h_1930 == 1) {
-            $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '2', '19.3')";
-            mysqli_query($db, $query);
-        }
-        if ($h_21 == 1) {
-            $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '2', '21.0')";
-            mysqli_query($db, $query);
-        }
+
 
         if ($_SESSION['tf'] == 1) {
             header('location: pref_hours_tf.php');
@@ -359,8 +401,6 @@ if (isset($_POST['add_preferred_hours_w'])) {
 if (isset($_POST['add_preferred_hours_tf'])) {
     $course_code =  $_SESSION['added_course'];
     if (count($errors) == 0) {
-        $h_7 = mysqli_real_escape_string($db, $_POST['h_7']);
-        $h_8 = mysqli_real_escape_string($db, $_POST['h_8']);
         $h_9 = mysqli_real_escape_string($db, $_POST['h_9']);
         $h_1030 = mysqli_real_escape_string($db, $_POST['h_1030']);
         $h_12 = mysqli_real_escape_string($db, $_POST['h_12']);
@@ -369,17 +409,6 @@ if (isset($_POST['add_preferred_hours_tf'])) {
         $h_1630 = mysqli_real_escape_string($db, $_POST['h_1630']);
         $h_18 = mysqli_real_escape_string($db, $_POST['h_18']);
         $h_1930 = mysqli_real_escape_string($db, $_POST['h_1930']);
-        $h_21 = mysqli_real_escape_string($db, $_POST['h_21']);
-        if ($h_7 == 1) {
-            $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '3', '7.0')";
-            mysqli_query($db, $query);
-        }
-        if ($h_8 == 1) {
-            $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '3', '8.0')";
-            mysqli_query($db, $query);
-        }
         if ($h_9 == 1) {
             $query = "INSERT INTO courses_hours (course_code, day, hour) 
                     VALUES('$course_code', '3', '9.0')";
@@ -387,7 +416,7 @@ if (isset($_POST['add_preferred_hours_tf'])) {
         }
         if ($h_1030 == 1) {
             $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '3', '10.3')";
+                    VALUES('$course_code', '3', '10.5')";
             mysqli_query($db, $query);
         }
         if ($h_12 == 1) {
@@ -397,7 +426,7 @@ if (isset($_POST['add_preferred_hours_tf'])) {
         }
         if ($h_1330 == 1) {
             $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '3', '13.3')";
+                    VALUES('$course_code', '3', '13.5')";
             mysqli_query($db, $query);
         }
         if ($h_15 == 1) {
@@ -407,7 +436,7 @@ if (isset($_POST['add_preferred_hours_tf'])) {
         }
         if ($h_1630 == 1) {
             $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '3', '16.3')";
+                    VALUES('$course_code', '3', '16.5')";
             mysqli_query($db, $query);
         }
         if ($h_18 == 1) {
@@ -417,12 +446,7 @@ if (isset($_POST['add_preferred_hours_tf'])) {
         }
         if ($h_1930 == 1) {
             $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '3', '19.3')";
-            mysqli_query($db, $query);
-        }
-        if ($h_21 == 1) {
-            $query = "INSERT INTO courses_hours (course_code, day, hour) 
-                    VALUES('$course_code', '3', '21.0')";
+                    VALUES('$course_code', '3', '19.5')";
             mysqli_query($db, $query);
         }
         header('location: instructor.php');
@@ -435,7 +459,9 @@ if (isset($_POST['add_unavailable_days'])) {
     $_SESSION['w'] = 0;
     $_SESSION['tf'] = 0;
     $instructor = $_SESSION['username'];
-    $query = "DELETE FROM courses_unable_hours WHERE instructor_username = '$instructor'";
+    $query = "DELETE FROM instructors_unable_hours WHERE instructor_username = '$instructor'";
+    mysqli_query($db, $query);
+    $query = "DELETE FROM instructors_unable_hours_wednesdays WHERE instructor_username = '$instructor'";
     mysqli_query($db, $query);
     $mt = 0;
     $w = 0;
@@ -454,108 +480,94 @@ if (isset($_POST['add_unavailable_days'])) {
             $_SESSION['tf'] = 1;
         }
         if ($mt == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '1', '7.0')";
-            mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '1', '8.0')";
-            mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
                     VALUES('$instructor', '1', '9.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '1', '10.3')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '1', '10.5')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
                     VALUES('$instructor', '1', '12.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '1', '13.3')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '1', '13.5')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
                     VALUES('$instructor', '1', '15.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '1', '16.3')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '1', '16.5')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
                     VALUES('$instructor', '1', '18.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '1', '19.3')";
-            mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '1', '21.0')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '1', '19.5')";
             mysqli_query($db, $query);
         }
         if ($w == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '7.0')";
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '9.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '8.0')";
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '10.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '9.0')";
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '11.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '10.3')";
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '12.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '12.0')";
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '13.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '13.3')";
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '14.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '15.0')";
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '15.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '16.3')";
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '16.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '18.0')";
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '17.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '19.3')";
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '18.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '21.0')";
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '19.0')";
+            mysqli_query($db, $query);
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '20.0')";
             mysqli_query($db, $query);
         }
         if ($tf == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '7.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '8.0')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '2', '9.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '9.0')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '2', '10.5')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '10.3')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '2', '12.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '12.0')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '2', '13.5')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '13.3')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '2', '15.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '15.0')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '2', '16.5')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '16.3')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '2', '18.0')";
             mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '18.0')";
-            mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '19.3')";
-            mysqli_query($db, $query);
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '21.0')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '2', '19.5')";
             mysqli_query($db, $query);
         }
         if ($mt == 0) {
@@ -572,8 +584,6 @@ if (isset($_POST['add_unavailable_days'])) {
 if (isset($_POST['add_unavailable_hours_mt'])) {
     $instructor = $_SESSION['username'];
     if (count($errors) == 0) {
-        $h_7 = mysqli_real_escape_string($db, $_POST['h_7']);
-        $h_8 = mysqli_real_escape_string($db, $_POST['h_8']);
         $h_9 = mysqli_real_escape_string($db, $_POST['h_9']);
         $h_1030 = mysqli_real_escape_string($db, $_POST['h_1030']);
         $h_12 = mysqli_real_escape_string($db, $_POST['h_12']);
@@ -582,60 +592,44 @@ if (isset($_POST['add_unavailable_hours_mt'])) {
         $h_1630 = mysqli_real_escape_string($db, $_POST['h_1630']);
         $h_18 = mysqli_real_escape_string($db, $_POST['h_18']);
         $h_1930 = mysqli_real_escape_string($db, $_POST['h_1930']);
-        $h_21 = mysqli_real_escape_string($db, $_POST['h_21']);
-        if ($h_7 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '1', '7.0')";
-            mysqli_query($db, $query);
-        }
-        if ($h_8 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '1', '8.0')";
-            mysqli_query($db, $query);
-        }
         if ($h_9 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
                     VALUES('$instructor', '1', '9.0')";
             mysqli_query($db, $query);
         }
         if ($h_1030 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '1', '10.3')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '1', '10.5')";
             mysqli_query($db, $query);
         }
         if ($h_12 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
                     VALUES('$instructor', '1', '12.0')";
             mysqli_query($db, $query);
         }
         if ($h_1330 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '1', '13.3')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '1', '13.5')";
             mysqli_query($db, $query);
         }
         if ($h_15 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
                     VALUES('$instructor', '1', '15.0')";
             mysqli_query($db, $query);
         }
         if ($h_1630 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '1', '16.3')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '1', '16.5')";
             mysqli_query($db, $query);
         }
         if ($h_18 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
                     VALUES('$instructor', '1', '18.0')";
             mysqli_query($db, $query);
         }
         if ($h_1930 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '1', '19.3')";
-            mysqli_query($db, $query);
-        }
-        if ($h_21 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '1', '21.0')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '1', '19.5')";
             mysqli_query($db, $query);
         }
         if ($_SESSION['w'] == 0) {
@@ -650,70 +644,76 @@ if (isset($_POST['add_unavailable_hours_mt'])) {
 if (isset($_POST['add_unavailable_hours_w'])) {
     $instructor = $_SESSION['username'];
     if (count($errors) == 0) {
-        $h_7 = mysqli_real_escape_string($db, $_POST['h_7']);
-        $h_8 = mysqli_real_escape_string($db, $_POST['h_8']);
         $h_9 = mysqli_real_escape_string($db, $_POST['h_9']);
-        $h_1030 = mysqli_real_escape_string($db, $_POST['h_1030']);
+        $h_10 = mysqli_real_escape_string($db, $_POST['h_10']);
+        $h_11 = mysqli_real_escape_string($db, $_POST['h_11']);
         $h_12 = mysqli_real_escape_string($db, $_POST['h_12']);
-        $h_1330 = mysqli_real_escape_string($db, $_POST['h_1330']);
+        $h_13 = mysqli_real_escape_string($db, $_POST['h_13']);
+        $h_14 = mysqli_real_escape_string($db, $_POST['h_14']);
         $h_15 = mysqli_real_escape_string($db, $_POST['h_15']);
-        $h_1630 = mysqli_real_escape_string($db, $_POST['h_1630']);
+        $h_16 = mysqli_real_escape_string($db, $_POST['h_16']);
+        $h_17 = mysqli_real_escape_string($db, $_POST['h_17']);
         $h_18 = mysqli_real_escape_string($db, $_POST['h_18']);
-        $h_1930 = mysqli_real_escape_string($db, $_POST['h_1930']);
-        $h_21 = mysqli_real_escape_string($db, $_POST['h_21']);
-        if ($h_7 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '7.0')";
-            mysqli_query($db, $query);
-        }
-        if ($h_8 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '8.0')";
-            mysqli_query($db, $query);
-        }
+        $h_19 = mysqli_real_escape_string($db, $_POST['h_19']);
+        $h_20 = mysqli_real_escape_string($db, $_POST['h_20']);
         if ($h_9 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '9.0')";
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '9.0')";
             mysqli_query($db, $query);
         }
-        if ($h_1030 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '10.3')";
+        if ($h_10 == 1) {
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '10.0')";
+            mysqli_query($db, $query);
+        }
+        if ($h_11 == 1) {
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '11.0')";
             mysqli_query($db, $query);
         }
         if ($h_12 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '12.0')";
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '12.0')";
             mysqli_query($db, $query);
         }
-        if ($h_1330 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '13.3')";
+        if ($h_13 == 1) {
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '13.0')";
+            mysqli_query($db, $query);
+        }
+        if ($h_14 == 1) {
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '14.0')";
             mysqli_query($db, $query);
         }
         if ($h_15 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '15.0')";
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '15.0')";
             mysqli_query($db, $query);
         }
-        if ($h_1630 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '16.3')";
+        if ($h_16 == 1) {
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '16.0')";
+            mysqli_query($db, $query);
+        }
+        if ($h_17 == 1) {
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '17.0')";
             mysqli_query($db, $query);
         }
         if ($h_18 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '18.0')";
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '18.0')";
             mysqli_query($db, $query);
         }
-        if ($h_1930 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '19.3')";
+        if ($h_19 == 1) {
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '19.0')";
             mysqli_query($db, $query);
         }
-        if ($h_21 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '2', '21.0')";
+        if ($h_20 == 1) {
+            $query = "INSERT INTO instructors_unable_hours_wednesdays (instructor_username, hour) 
+                    VALUES('$instructor',  '20.0')";
             mysqli_query($db, $query);
         }
 
@@ -727,8 +727,6 @@ if (isset($_POST['add_unavailable_hours_w'])) {
 if (isset($_POST['add_unavailable_hours_tf'])) {
     $instructor = $_SESSION['username'];
     if (count($errors) == 0) {
-        $h_7 = mysqli_real_escape_string($db, $_POST['h_7']);
-        $h_8 = mysqli_real_escape_string($db, $_POST['h_8']);
         $h_9 = mysqli_real_escape_string($db, $_POST['h_9']);
         $h_1030 = mysqli_real_escape_string($db, $_POST['h_1030']);
         $h_12 = mysqli_real_escape_string($db, $_POST['h_12']);
@@ -737,60 +735,44 @@ if (isset($_POST['add_unavailable_hours_tf'])) {
         $h_1630 = mysqli_real_escape_string($db, $_POST['h_1630']);
         $h_18 = mysqli_real_escape_string($db, $_POST['h_18']);
         $h_1930 = mysqli_real_escape_string($db, $_POST['h_1930']);
-        $h_21 = mysqli_real_escape_string($db, $_POST['h_21']);
-        if ($h_7 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '7.0')";
-            mysqli_query($db, $query);
-        }
-        if ($h_8 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '8.0')";
-            mysqli_query($db, $query);
-        }
         if ($h_9 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '9.0')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '2', '9.0')";
             mysqli_query($db, $query);
         }
         if ($h_1030 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '10.3')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '2', '10.5')";
             mysqli_query($db, $query);
         }
         if ($h_12 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '12.0')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '2', '12.0')";
             mysqli_query($db, $query);
         }
         if ($h_1330 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '13.3')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '2', '13.5')";
             mysqli_query($db, $query);
         }
         if ($h_15 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '15.0')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '2', '15.0')";
             mysqli_query($db, $query);
         }
         if ($h_1630 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '16.3')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '2', '16.5')";
             mysqli_query($db, $query);
         }
         if ($h_18 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '18.0')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '2', '18.0')";
             mysqli_query($db, $query);
         }
         if ($h_1930 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '19.3')";
-            mysqli_query($db, $query);
-        }
-        if ($h_21 == 1) {
-            $query = "INSERT INTO courses_unable_hours (instructor_username, day, hour) 
-                    VALUES('$instructor', '3', '21.0')";
+            $query = "INSERT INTO instructors_unable_hours (instructor_username, day, hour) 
+                    VALUES('$instructor', '2', '19.5')";
             mysqli_query($db, $query);
         }
         header('location: instructor.php');
@@ -828,6 +810,37 @@ if (isset($_POST['courses_conflict'])) {
     }
 }
 
+// ADD COURSES PARALLEL
+if (isset($_POST['courses_parallel'])) {
+    $course_code1 = mysqli_real_escape_string($db, $_POST['c1']);
+    $course_code2 = mysqli_real_escape_string($db, $_POST['c2']);
+    $q = "SELECT * FROM parallel WHERE ( course_code1 = '$course_code1' AND  course_code2 = '$course_code2' ) OR ( course_code1 = '$course_code2' AND  course_code2 = '$course_code1' ) LIMIT 1";
+    $result = mysqli_query($db, $q);
+    $user = mysqli_fetch_assoc($result);
+    if ($user) {
+        function_alert("Courses parallel already exists!");
+    } else {
+        $q = "SELECT * FROM courses WHERE ( course_code = '$course_code1')";
+        $result = mysqli_query($db, $q);
+        $user = mysqli_fetch_assoc($result);
+        if (!$user) {
+            function_alert("First course does not exist");
+        } else {
+            $q = "SELECT * FROM courses WHERE ( course_code = '$course_code2')";
+            $result = mysqli_query($db, $q);
+            $user = mysqli_fetch_assoc($result);
+            if (!$user) {
+                function_alert("Second course does not exist");
+            } else if (count($errors) == 0) {
+                $query = "INSERT INTO parallel (course_code1, course_code2)
+                        VALUES('$course_code1', '$course_code2')";
+                mysqli_query($db, $query);
+                function_alert("Courses parallel Added!");
+            }
+        }
+    }
+}
+
 // ADD ROOM
 if (isset($_POST['add_room'])) {
     $room_capacity = mysqli_real_escape_string($db, $_POST['add_room_capacity']);
@@ -838,7 +851,7 @@ if (isset($_POST['add_room'])) {
     if ($user) {
         function_alert("Room already exists!");
     } else {
-        $query = "INSERT INTO rooms (room_number, room_capacity) VALUES('$room_number', '$room_number')";
+        $query = "INSERT INTO rooms (room_number, room_capacity) VALUES('$room_number', '$room_capacity')";
         mysqli_query($db, $query);
         function_alert("Room added!");
     }
@@ -858,3 +871,19 @@ if (isset($_POST['logout_b'])) {
     session_destroy();
     header('location: ../index.php');
 }
+
+
+if (isset($_POST['run_algo'])) {
+    //$filename = 'read_input.py'; // or whatever your filename is
+    //$output = shell_exec("/usr/bin/python3 /opt/lampp/htdocs/python/$filename");
+
+    $query = "DELETE FROM run";
+    mysqli_query($db, $query);
+    $query = "INSERT INTO run (start) VALUES('1')";
+    mysqli_query($db, $query);
+    //$command = escapeshellcmd('python3 hello.py');
+    //$output = shell_exec($command);
+    //echo $output;
+}
+
+

@@ -49,6 +49,9 @@
                                 <a class="nav-link" href="add_courses_conflict.php">Add courses conflicts</a>
                             </li>
                             <li class="nav-item">
+                            <a class="nav-link" href="add_courses_parallel.php">Add courses in parallel</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" href="add_room.php">Add a room</a>
                             </li>
                             <li class="nav-item">
@@ -95,13 +98,13 @@
                 foreach ($courses as $item) {
                     if ($i == 1) {
                         if ($row[$item] == 1)
-                            echo '<td>Lectures only</td>';
+                            echo '<td>Lecture</td>';
                         else if ($row[$item] == 2)
-                            echo '<td>Lectures and a tutorial</td>';
+                            echo '<td>Tutorial</td>';
                         else if ($row[$item] == 3)
-                            echo '<td>Lectures, a tutorial and 1 lab a week</td>';
+                            echo '<td>Once a week Lab</td>';
                         else if ($row[$item] == 4)
-                            echo '<td>Lectures, a tutorial and 2 labs a week</td>';
+                            echo '<td>Twice a week Lab</td>';
                     } else
                         echo '<td>' . $row[$item] . '</td>';
                     $i++;

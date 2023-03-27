@@ -49,6 +49,9 @@
                 <a class="nav-link" href="add_courses_conflict.php" style="color:blanchedalmond">Add courses conflicts</a>
               </li>
               <li class="nav-item">
+                <a class="nav-link" href="add_courses_parallel.php">Add courses in parallel</a>
+              </li>
+              <li class="nav-item">
                 <a class="nav-link" href="add_room.php">Add a room</a>
               </li>
               <li class="nav-item">

@@ -49,6 +49,9 @@
                 <a class="nav-link" href="add_courses_conflict.php">Add courses conflicts</a>
               </li>
               <li class="nav-item">
+                <a class="nav-link" href="add_courses_parallel.php">Add courses in parallel</a>
+              </li>
+              <li class="nav-item">
                 <a class="nav-link" href="add_room.php">Add a room</a>
               </li>
               <li class="nav-item">
@@ -83,13 +86,7 @@
             <li class="list-group-item" style="background-color: #6a6e73;">
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="exampleRadios" id="algo1" value="1" checked>
-                <label class="form-check-label" for="algo1">Algorithm 1</label>
-              </div>
-            </li>
-            <li class="list-group-item" style="background-color: #6a6e73;">
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="exampleRadios" id="algo2" value="1">
-                <label class="form-check-label" for="algo2">Algorithm 2</label>
+                <label class="form-check-label" for="algo1">MInizinc Constraints Solver</label>
               </div>
             </li>
           </ul>

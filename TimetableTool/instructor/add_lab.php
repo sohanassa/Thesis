@@ -75,15 +75,24 @@
             <h4 style="text-align: center;">Add a labratory</h4>
             <br>
             <form method="post" action="add_lab.php">
-                <?php include(dirname(dirname(__FILE__)) . '/errors.php'); ?>
-                <div class="form-group">
-                    <label for="course_code">Choose course assosiated with this labratory</label>
-                    <input required type="text" class="form-control" id="course_code" name="course_code" placeholder="EPL100">
-                </div>
-                <div class="form-group">
-                    <label for="lab_code">Lab code</label>
-                    <input required type="text" class="form-control" id="lab_code" name="lab_code" placeholder="1A">
-                </div>
+            <?php include(dirname(dirname(__FILE__)) . '/errors.php'); ?>
+            <div class="form-group">
+            <label for="course_code">Choose lab to teach</label>
+            <?php
+                $sql = "SELECT course_code FROM courses WHERE (course_type = 2 OR course_type = 4) AND instructor_username IS NULL";
+                $result = mysqli_query($db, $sql);
+
+                if ($result->num_rows > 0) {
+                  echo "<select required class='form-control' id='lab_code' name='lab_code' type='text'>";
+                  while ($row = $result->fetch_assoc()) {
+                    echo "<option value='" . $row["course_code"] . "'>" . $row["course_code"] . "</option>";
+                  }
+                  echo "</select>";
+                } else {
+                  echo "No courses found!";
+                }
+            ?>
+        </div>
                 <div style="height: 10px;"></div>
                 <div style="text-align: center; display:flex; justify-content: center;">
                     <button type="submit" class="btn btn-outline-light" name="add_lab">Submit and continue</button>

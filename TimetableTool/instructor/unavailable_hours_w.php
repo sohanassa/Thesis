@@ -80,44 +80,55 @@
                 <div style="width: 40%; margin: 0 auto;">
                     <ul class="list-group">
                         <li class="list-group-item" style="background-color: #6a6e73;">
-                            <input class="form-check-input me-2" name="h_7" type="checkbox" id="h_7" value="1">
-                            <label class="form-check-label" for="h_7">07:00-08:30</label>
+                            <input class="form-check-input me-2" name="h_9" type="checkbox" id="h_9" value="1">
+                            <label class="form-check-label" for="h_9">09:00-10:00</label>
                         </li>
                         <li class="list-group-item" style="background-color: #6a6e73;">
-                            <input class="form-check-input me-2" name="h_8" type="checkbox" id="h_8" value="1">
-                            <label class="form-check-label" for="h_8">08:00-09:30</label>
+                            <input class="form-check-input me-2" name="h_10" type="checkbox" id="h_10" value="1">
+                            <label class="form-check-label" for="h_10">10:00-11:00</label>
                         </li>
                         <li class="list-group-item" style="background-color: #6a6e73;">
-                            <input class="form-check-input me-2" name="h_1030" type="checkbox" id="h_1030" value="1">
-                            <label class="form-check-label" for="h_1030">10:30-12:00</label>
+                            <input class="form-check-input me-2" name="h_11" type="checkbox" id="h_11" value="1">
+                            <label class="form-check-label" for="h_11">11:00-12:00</label>
                         </li>
                         <li class="list-group-item" style="background-color: #6a6e73;">
                             <input class="form-check-input me-2" name="h_12" type="checkbox" id="h_12" value="1">
-                            <label class="form-check-label" for="h_12">12:00-13:30</label>
+                            <label class="form-check-label" for="h_12">12:00-13:00</label>
                         </li>
                         <li class="list-group-item" style="background-color: #6a6e73;">
-                            <input class="form-check-input me-2" name="h_1330" type="checkbox" id="h_1330" value="1">
-                            <label class="form-check-label" for="h_1330">13:30-15:00</label>
+                            <input class="form-check-input me-2" name="h_13" type="checkbox" id="h_13" value="1">
+                            <label class="form-check-label" for="h_13">13:00-14:00</label>
+                        </li>
+                        <li class="list-group-item" style="background-color: #6a6e73;">
+                            <input class="form-check-input me-2" name="h_14" type="checkbox" id="h_14" value="1">
+                            <label class="form-check-label" for="h_14">14:00-15:00</label>
                         </li>
                         <li class="list-group-item" style="background-color: #6a6e73;">
                             <input class="form-check-input me-2" name="h_15" type="checkbox" id="h_15" value="1">
-                            <label class="form-check-label" for="h_15">15:00-16:30</label>
+                            <label class="form-check-label" for="h_15">15:00-16:00</label>
                         </li>
                         <li class="list-group-item" style="background-color: #6a6e73;">
-                            <input class="form-check-input me-2" name="h_1630" type="checkbox" id="h_1630" value="1">
-                            <label class="form-check-label" for="h_1630">16:30-18:00</label>
+                            <input class="form-check-input me-2" name="h_16" type="checkbox" id="h_16" value="1">
+                            <label class="form-check-label" for="h_16">16:00-17:00</label>
+                        </li>
+                        </li>
+                        <li class="list-group-item" style="background-color: #6a6e73;">
+                            <input class="form-check-input me-2" name="h_17" type="checkbox" id="h_17" value="1">
+                            <label class="form-check-label" for="h_17">17:00-18:00</label>
+                        </li>
                         </li>
                         <li class="list-group-item" style="background-color: #6a6e73;">
                             <input class="form-check-input me-2" name="h_18" type="checkbox" id="h_18" value="1">
-                            <label class="form-check-label" for="h_18">18:00-19:30</label>
+                            <label class="form-check-label" for="h_18">18:00-19:00</label>
                         </li>
                         <li class="list-group-item" style="background-color: #6a6e73;">
-                            <input class="form-check-input me-2" name="h_1930" type="checkbox" id="h_1930" value="1">
-                            <label class="form-check-label" for="h_1930">19:30-21:00</label>
+                            <input class="form-check-input me-2" name="h_19" type="checkbox" id="h_19" value="1">
+                            <label class="form-check-label" for="h_19">19:00-20:00</label>
+                        </li>
                         </li>
                         <li class="list-group-item" style="background-color: #6a6e73;">
-                            <input class="form-check-input me-2" name="h_21" type="checkbox" id="h_21" value="1">
-                            <label class="form-check-label" for="h_21">21:00-22:30</label>
+                            <input class="form-check-input me-2" name="h_20" type="checkbox" id="h_20" value="1">
+                            <label class="form-check-label" for="h_20">20:00-21:00</label>
                         </li>
                     </ul>
                 </div>
