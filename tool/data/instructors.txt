@@ -1,0 +1,7 @@
+1	aaa
+2	asd
+3	ggg
+4	INSTR1
+5	INSTR2
+6	sohaib
+7	www
