@@ -1,2 +1,2 @@
 # Thesis
-Sohaib Nassars thesis project: A time scheduling tool using constraint satisfaction.
+Sohaib Nassars thesis project: A Course scheduling tool using constraint satisfaction programming.

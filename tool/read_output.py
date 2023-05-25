@@ -4,7 +4,7 @@ from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
 
 filename = 'data/result.txt'
-output_file = 'schedule_tables.pdf'
+output_file = 'all_schedules.pdf'
 
 data = []
 data_w = []
@@ -12,15 +12,11 @@ data_w = []
 with open(filename, 'r') as file:
     for line in file:
         if line.strip() == "WEDNESDAY SCHEDULE:":
-            # Save the current data in data_w and reset data
             data = data_w.copy()
             data_w = []
         else:
-            # Append the line to data
             data_w.append(line.strip())
 
-# After the loop is done, save the last set of data in data_w
-#data = data_w.copy()
 c = canvas.Canvas(output_file, pagesize=letter)
 
 x_offset = 0.5 * inch
@@ -41,7 +37,6 @@ for i in range(len(data)):
             with open('data/courses.txt', 'r') as f2:
                 for j, row in enumerate(schedule_data):
                     cols = row.split(',')
-                    # wed_cnt = 0
                     for col in cols:
                         if row.startswith("Instructor:"):
                             if cnt == 3:
@@ -59,7 +54,6 @@ for i in range(len(data)):
                                     break
                             c.drawString(x_offset, y_offset, "Instructor:")
                             x_offset += 0.8 * inch
-                            #c.line(x_offset, y_offset - line_height * 2, x_offset  * inch, y_offset - line_height)
                             c.drawString(x_offset, y_offset, col)
                             x_offset -= 0.8 * inch
                             y_offset -= line_height
@@ -73,31 +67,19 @@ for i in range(len(data)):
                                     parts = line.strip().split('\t')
                                     if len(parts) >= 2 and parts[0] == col:
                                         col = parts[1]
-                                        break
-                                #c.line(x_offset, y_offset - line_height * 2, x_offset  * inch, y_offset - line_height)
-                                # if wed_cnt == 2:
-                                #     c.drawString(x_offset, y_offset, data_w[j])
-                                # else: 
+                                        break 
                                 c.drawString(x_offset, y_offset, col)
-                                # wed_cnt +=1
                                 x_offset += 0.75 * inch
                             else: 
-                                #c.line(x_offset, y_offset - line_height * 2, x_offset  * inch, y_offset - line_height)
-                                # if wed_cnt == 2:
-                                #      c.drawString(x_offset, y_offset, data_w[j])
-                                # else: 
                                 c.drawString(x_offset, y_offset, col)
-                                # wed_cnt +=1
 
                                 x_offset += 0.75 * inch
                     y_offset -= line_height
                     x_offset = 0.5 * inch
-                    #j+=4
                 y_offset -= line_height
 
         
 
 c.save()
-#print(data_w[2])
 os.system(f'open {output_file}')
 

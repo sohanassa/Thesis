@@ -1,0 +1,90 @@
+CREATE TABLE admins
+(
+  admin_username VARCHAR(255) NOT NULL,
+  admin_password VARCHAR(255) NOT NULL,
+  PRIMARY KEY (admin_username)
+);
+
+CREATE TABLE rooms
+(
+  room_number VARCHAR(255) NOT NULL,
+  room_capacity INT NOT NULL,
+  PRIMARY KEY (room_number)
+);
+
+CREATE TABLE additional_info
+(
+  lectures_capacity INT NULL,
+  labratories_capacity INT NULL,
+  num_of_labs INT NULL,
+  num_of_lecture_rooms INT NULL
+);
+
+CREATE TABLE instructors
+(
+  instructor_username VARCHAR(255) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  instructor_password VARCHAR(255) NOT NULL,
+  surname VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  admin_username VARCHAR(255) NOT NULL,
+  first_login INT NOT NULL,
+  PRIMARY KEY (instructor_username),
+  FOREIGN KEY (admin_username) REFERENCES admins(admin_username),
+  UNIQUE (email)
+);
+
+CREATE TABLE courses
+(
+  course_code VARCHAR(255) NOT NULL,
+  course_type INT NOT NULL,
+  max_students INT NOT NULL,
+  days_preference INT NULL,
+  instructor_username VARCHAR(255) NOT NULL,
+  num_of_labs INT NULL,
+  PRIMARY KEY (course_code),
+  FOREIGN KEY (instructor_username) REFERENCES instructors(instructor_username)
+);
+
+CREATE TABLE courses_hours
+(
+  course_code VARCHAR(255) NOT NULL,
+  hour FLOAT NOT NULL,
+  day INT NOT NULL,
+  PRIMARY KEY (course_code, hour, day),
+  FOREIGN KEY (course_code) REFERENCES courses(course_code)
+);
+
+CREATE TABLE courses_hours_wednesdays
+(
+  course_code VARCHAR(255) NOT NULL,
+  hour FLOAT NOT NULL,
+  PRIMARY KEY (course_code, hour),
+  FOREIGN KEY (course_code) REFERENCES courses(course_code)
+);
+
+CREATE TABLE instructors_unable_hours
+(
+  instructor_username VARCHAR(255) NOT NULL,
+  hour FLOAT NOT NULL,
+  day INT NOT NULL,
+  PRIMARY KEY (instructor_username, hour, day),
+  FOREIGN KEY (instructor_username) REFERENCES instructors(instructor_username)
+);
+
+CREATE TABLE instructors_unable_hours_wednesdays
+(
+  instructor_username VARCHAR(255) NOT NULL,
+  hour FLOAT NOT NULL,
+  PRIMARY KEY (instructor_username, hour),
+  FOREIGN KEY (instructor_username) REFERENCES instructors(instructor_username)
+);
+
+CREATE TABLE conflicts
+(
+  course_code1 VARCHAR(255) NOT NULL,
+  course_code2 VARCHAR(255) NOT NULL,
+  PRIMARY KEY (course_code1, course_code2),
+  FOREIGN KEY (course_code1) REFERENCES courses(course_code),
+  FOREIGN KEY (course_code2) REFERENCES courses(course_code)
+);
